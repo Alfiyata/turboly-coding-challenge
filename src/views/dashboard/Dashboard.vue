@@ -17,12 +17,14 @@ const data: User[] = [
     task: 'Alfiyata',
     dueDate: 'alfy@gmail.com',
     priority: 'High',
+    is_finished: false,
   },
   {
     id: 2,
     task: 'John',
     dueDate: 'john@gmail.com',
     priority: 'Medium',
+    is_finished: true,
   },
 ]
 
