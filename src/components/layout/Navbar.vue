@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.store'
 import { User, X, Menu } from '@lucide/vue';
+
 
 const navigation = [
   { name: 'Dashboard', to: '/dashboard' },
@@ -12,6 +13,10 @@ const router = useRouter()
 const authStore = useAuthStore()
 const isMobileMenuOpen = ref(false)
 const isUserMenuOpen = ref(false)
+
+const getUserName = computed(() => {
+  return localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user') as string).name : 'User'
+})
 
 function toggleMobileMenu() {
   isMobileMenuOpen.value = !isMobileMenuOpen.value
@@ -59,34 +64,23 @@ async function logout() {
         </div>
 
         <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+          <p class="hidden md:block text-black">{{ getUserName }}</p>
           <div class="relative ml-3">
-            <button
-              type="button"
+            <button type="button"
               class="relative flex size-9 items-center justify-center rounded-full bg-[#3F3F3F] text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-              :aria-expanded="isUserMenuOpen"
-              @click="toggleUserMenu"
-            >
+              :aria-expanded="isUserMenuOpen" @click="toggleUserMenu">
               <span class="sr-only">Open user menu</span>
               <User class="h-5 w-5" aria-hidden="true" />
             </button>
 
-            <transition
-              enter-active-class="transition ease-out duration-100"
-              enter-from-class="scale-95 opacity-0"
-              enter-to-class="scale-100 opacity-100"
-              leave-active-class="transition ease-in duration-75"
-              leave-from-class="scale-100 opacity-100"
-              leave-to-class="scale-95 opacity-0"
-            >
-              <div
-                v-if="isUserMenuOpen"
-                class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-[#3F3F3F] py-1 outline -outline-offset-1 outline-white/10"
-              >
-                <button
-                  type="button"
+            <transition enter-active-class="transition ease-out duration-100" enter-from-class="scale-95 opacity-0"
+              enter-to-class="scale-100 opacity-100" leave-active-class="transition ease-in duration-75"
+              leave-from-class="scale-100 opacity-100" leave-to-class="scale-95 opacity-0">
+              <div v-if="isUserMenuOpen"
+                class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-[#3F3F3F] py-1 outline -outline-offset-1 outline-white/10">
+                <button type="button"
                   class="block w-full px-4 py-2 text-left text-sm text-gray-300 hover:bg-white/10 hover:text-white"
-                  @click="logout"
-                >
+                  @click="logout">
                   Sign out
                 </button>
               </div>

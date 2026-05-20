@@ -91,40 +91,26 @@ watch(selectedDueDate, (date) => {
 <template>
   <div class="rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden p-4">
     <div class="mb-4 flex flex-wrap items-center gap-3">
+      <Input v-model="nameFilterValue" placeholder="Search name"
+        class="w-full border border-gray-300 focus:ring-2 focus:ring-gray-500 focus:outline-none sm:w-44" />
+      <div class="w-full sm:w-44">
+        <VueDatePicker v-model="selectedDueDate" placeholder="Search date" :enable-time-picker="false" :teleport="true"
+          :ui="{ menu: 'z-[999999]' }"
+          input-class-name="h-9 rounded-md border border-gray-300 text-sm focus:ring-2 focus:ring-gray-500 focus:outline-none" />
+      </div>
       <div v-if="filterColumnId" class="w-full sm:w-44">
-        <Select
-          v-model="filterValue"
-          class="border border-gray-300 focus:ring-2 focus:ring-gray-500 focus:outline-none"
-        >
+        <Select v-model="filterValue"
+          class="border border-gray-300 focus:ring-2 focus:ring-gray-500 focus:outline-none">
           <option value="">
             {{ filterPlaceholder ?? "All" }}
           </option>
-          <option
-            v-for="option in filterOptions"
-            :key="option.value"
-            :value="option.value"
-          >
+          <option v-for="option in filterOptions" :key="option.value" :value="option.value">
             {{ option.label }}
           </option>
         </Select>
       </div>
-      <div class="w-full sm:w-44">
-        <VueDatePicker
-          v-model="selectedDueDate"
-          placeholder="Search date"
-          :enable-time-picker="false"
-          :teleport="true"
-          :ui="{ menu: 'z-[999999]' }"
-          input-class-name="h-9 rounded-md border border-gray-300 text-sm focus:ring-2 focus:ring-gray-500 focus:outline-none"
-        />
-      </div>
-      <Input
-        v-model="nameFilterValue"
-        placeholder="Search name"
-        class="w-full border border-gray-300 focus:ring-2 focus:ring-gray-500 focus:outline-none sm:w-44"
-      />
     </div>
-   
+
 
     <table class="w-full">
       <thead>
