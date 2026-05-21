@@ -20,6 +20,8 @@ const lastPage = ref(1)
 const totalData = ref(0)
 const isLoading = ref(false)
 const incompleteTodayTaskCount = ref(0)
+const titleFilter = ref('')
+let titleFilterTimeout: number | undefined
 
 const dashboardAlert = computed(() => {
   const count = incompleteTodayTaskCount.value
@@ -58,6 +60,7 @@ async function fetchTasks(page = currentPage.value) {
     const response = await taskService.getAll({
       page,
       pageSize,
+      title: titleFilter.value || undefined,
     })
 
     data.value = response.data
@@ -76,6 +79,18 @@ async function fetchIncompleteTodayTasks() {
 
 async function onPageChange(page: number) {
   await fetchTasks(page)
+}
+
+function onTitleChange(title: string) {
+  titleFilter.value = title
+
+  if (titleFilterTimeout) {
+    window.clearTimeout(titleFilterTimeout)
+  }
+
+  titleFilterTimeout = window.setTimeout(() => {
+    fetchTasks(1)
+  }, 400)
 }
 
 async function onTaskCreated() {
@@ -128,11 +143,13 @@ onMounted(() => {
     :page-size="pageSize"
     :total-data="totalData"
     :loading="isLoading"
+    :title-filter="titleFilter"
     :alert-title="dashboardAlert.title"
     :alert-description="dashboardAlert.description"
     :alert-variant="dashboardAlert.variant"
     @page-change="onPageChange"
     @task-created="onTaskCreated"
     @status-change="onStatusChange"
+    @title-change="onTitleChange"
   />
 </template>

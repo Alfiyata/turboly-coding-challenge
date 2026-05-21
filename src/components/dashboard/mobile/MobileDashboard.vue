@@ -16,12 +16,14 @@ defineProps<{
   alertTitle: string
   alertDescription: string
   alertVariant: 'success' | 'danger'
+  titleFilter: string
 }>()
 
 const emit = defineEmits<{
   (e: 'page-change', page: number): void
   (e: 'task-created'): void
   (e: 'status-change', row: User, value: boolean): void
+  (e: 'title-change', title: string): void
 }>()
 
 const priorityOptions = [
@@ -55,8 +57,10 @@ const priorityOptions = [
       :page-size="pageSize"
       :total-data="totalData"
       :loading="loading"
+      :title-filter="titleFilter"
       @status-change="(row, value) => emit('status-change', row, value)"
       @page-change="emit('page-change', $event)"
+      @title-change="emit('title-change', $event)"
     />
   </main>
 </template>

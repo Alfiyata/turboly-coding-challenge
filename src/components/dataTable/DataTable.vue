@@ -28,11 +28,13 @@ const props = defineProps<{
   pageSize?: number;
   totalData?: number;
   loading?: boolean;
+  titleFilter?: string;
 }>();
 
 const emit = defineEmits<{
   (e: "page-change", page: number): void;
   (e: "status-change", row: any, value: boolean): void;
+  (e: "title-change", title: string): void;
 }>();
 
 const columnFilters = ref<ColumnFiltersState>([]);
@@ -83,10 +85,10 @@ const filterValue = computed<string | number>({
 
 const nameFilterValue = computed<string | number>({
   get() {
-    return (table.getColumn("title")?.getFilterValue() as string | number | undefined) ?? "";
+    return props.titleFilter ?? "";
   },
   set(value) {
-    table.getColumn("title")?.setFilterValue(value === "" ? undefined : value);
+    emit("title-change", String(value));
   },
 });
 

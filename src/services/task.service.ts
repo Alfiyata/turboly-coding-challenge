@@ -11,6 +11,7 @@ export interface CreateTaskPayload {
 export interface GetTasksParams {
   page: number;
   pageSize: number;
+  title?: string;
 }
 
 export interface GetTasksResponse {
