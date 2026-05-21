@@ -23,22 +23,25 @@ const props = defineProps<{
   filterColumnId?: string;
   filterPlaceholder?: string;
   filterOptions?: FilterOption[];
+  filterValue?: string | number;
   currentPage?: number;
   lastPage?: number;
   pageSize?: number;
   totalData?: number;
   loading?: boolean;
   titleFilter?: string;
+  dueDateFilter?: string;
 }>();
 
 const emit = defineEmits<{
   (e: "page-change", page: number): void;
   (e: "status-change", row: any, value: boolean): void;
   (e: "title-change", title: string): void;
+  (e: "filter-change", value: string | number): void;
+  (e: "due-date-change", dueDate: string): void;
 }>();
 
 const columnFilters = ref<ColumnFiltersState>([]);
-const selectedDueDate = ref<Date | null>(null);
 
 const table = useVueTable({
   get data() {
@@ -66,8 +69,12 @@ const table = useVueTable({
   },
 });
 
-const filterValue = computed<string | number>({
+const selectedFilterValue = computed<string | number>({
   get() {
+    if (props.filterValue !== undefined) {
+      return props.filterValue;
+    }
+
     if (!props.filterColumnId) {
       return "";
     }
@@ -80,6 +87,7 @@ const filterValue = computed<string | number>({
     }
 
     table.getColumn(props.filterColumnId)?.setFilterValue(value === "" ? undefined : value);
+    emit("filter-change", value);
   },
 });
 
@@ -100,9 +108,34 @@ function formatDueDate(date: Date) {
   return `${year}-${month}-${day}`;
 }
 
-watch(selectedDueDate, (date) => {
-  table.getColumn("due_date")?.setFilterValue(date ? formatDueDate(date) : undefined);
+function parseDueDate(date: string) {
+  const [year, month, day] = date.split("-").map(Number);
+
+  if (!year || !month || !day) {
+    return null;
+  }
+
+  return new Date(year, month - 1, day);
+}
+
+const selectedDueDate = computed<Date | null>({
+  get() {
+    return props.dueDateFilter ? parseDueDate(props.dueDateFilter) : null;
+  },
+  set(date) {
+    const dueDate = date ? formatDueDate(date) : "";
+    table.getColumn("due_date")?.setFilterValue(dueDate || undefined);
+    emit("due-date-change", dueDate);
+  },
 });
+
+watch(
+  () => props.dueDateFilter,
+  (dueDate) => {
+    table.getColumn("due_date")?.setFilterValue(dueDate || undefined);
+  },
+  { immediate: true },
+);
 
 const currentPage = computed(() => props.currentPage ?? 1);
 const lastPage = computed(() => props.lastPage ?? 1);
@@ -131,7 +164,7 @@ function goToPage(page: number) {
           input-class-name="h-9 rounded-md border border-gray-300 text-sm focus:ring-2 focus:ring-gray-500 focus:outline-none" />
       </div>
       <div v-if="filterColumnId" class="w-full sm:w-44">
-        <Select v-model="filterValue"
+        <Select v-model="selectedFilterValue"
           class="border border-gray-300 focus:ring-2 focus:ring-gray-500 focus:outline-none">
           <option value="">
             {{ filterPlaceholder ?? "All" }}

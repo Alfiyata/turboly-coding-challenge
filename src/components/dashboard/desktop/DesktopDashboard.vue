@@ -18,6 +18,8 @@ defineProps<{
   alertDescription: string
   alertVariant: 'success' | 'danger'
   titleFilter: string
+  priorityFilter: string | number
+  dueDateFilter: string
 }>()
 
 const emit = defineEmits<{
@@ -25,6 +27,8 @@ const emit = defineEmits<{
   (e: 'task-created'): void
   (e: 'status-change', row: User, value: boolean): void
   (e: 'title-change', title: string): void
+  (e: 'priority-change', priority: string | number): void
+  (e: 'due-date-change', dueDate: string): void
 }>()
 
 const priorityOptions = [
@@ -52,15 +56,19 @@ const priorityOptions = [
       filter-column-id="priority"
       filter-placeholder="All priorities"
       :filter-options="priorityOptions"
+      :filter-value="priorityFilter"
       :current-page="currentPage"
       :last-page="lastPage"
       :page-size="pageSize"
       :total-data="totalData"
       :loading="loading"
       :title-filter="titleFilter"
+      :due-date-filter="dueDateFilter"
       @status-change="(row, value) => emit('status-change', row, value)"
       @page-change="emit('page-change', $event)"
       @title-change="emit('title-change', $event)"
+      @filter-change="emit('priority-change', $event)"
+      @due-date-change="emit('due-date-change', $event)"
     />
   </main>
 </template>

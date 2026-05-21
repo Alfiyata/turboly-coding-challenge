@@ -21,6 +21,8 @@ const totalData = ref(0)
 const isLoading = ref(false)
 const incompleteTodayTaskCount = ref(0)
 const titleFilter = ref('')
+const priorityFilter = ref<string | number>('')
+const dueDateFilter = ref('')
 let titleFilterTimeout: number | undefined
 
 const dashboardAlert = computed(() => {
@@ -61,6 +63,8 @@ async function fetchTasks(page = currentPage.value) {
       page,
       pageSize,
       title: titleFilter.value || undefined,
+      priority: priorityFilter.value || undefined,
+      due_date: dueDateFilter.value || undefined,
     })
 
     data.value = response.data
@@ -91,6 +95,16 @@ function onTitleChange(title: string) {
   titleFilterTimeout = window.setTimeout(() => {
     fetchTasks(1)
   }, 400)
+}
+
+async function onPriorityChange(priority: string | number) {
+  priorityFilter.value = priority
+  await fetchTasks(1)
+}
+
+async function onDueDateChange(dueDate: string) {
+  dueDateFilter.value = dueDate
+  await fetchTasks(1)
 }
 
 async function onTaskCreated() {
@@ -144,6 +158,8 @@ onMounted(() => {
     :total-data="totalData"
     :loading="isLoading"
     :title-filter="titleFilter"
+    :priority-filter="priorityFilter"
+    :due-date-filter="dueDateFilter"
     :alert-title="dashboardAlert.title"
     :alert-description="dashboardAlert.description"
     :alert-variant="dashboardAlert.variant"
@@ -151,5 +167,7 @@ onMounted(() => {
     @task-created="onTaskCreated"
     @status-change="onStatusChange"
     @title-change="onTitleChange"
+    @priority-change="onPriorityChange"
+    @due-date-change="onDueDateChange"
   />
 </template>

@@ -67,7 +67,7 @@ async function logout() {
           <p class="hidden md:block text-black">{{ getUserName }}</p>
           <div class="relative ml-3">
             <button type="button"
-              class="relative flex size-9 items-center justify-center rounded-full bg-[#3F3F3F] text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+              class="cursor-pointer relative flex size-9 items-center justify-center rounded-full bg-[#3F3F3F] text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
               :aria-expanded="isUserMenuOpen" @click="toggleUserMenu">
               <span class="sr-only">Open user menu</span>
               <User class="h-5 w-5" aria-hidden="true" />
@@ -79,7 +79,7 @@ async function logout() {
               <div v-if="isUserMenuOpen"
                 class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-[#3F3F3F] py-1 outline -outline-offset-1 outline-white/10">
                 <button type="button"
-                  class="block w-full px-4 py-2 text-left text-sm text-gray-300 hover:bg-white/10 hover:text-white"
+                  class="cursor-pointer block w-full px-4 py-2 text-left text-sm text-gray-300 hover:bg-white/10 hover:text-white"
                   @click="logout">
                   Sign out
                 </button>

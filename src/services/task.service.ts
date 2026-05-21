@@ -12,6 +12,8 @@ export interface GetTasksParams {
   page: number;
   pageSize: number;
   title?: string;
+  priority?: string | number;
+  due_date?: string;
 }
 
 export interface GetTasksResponse {
