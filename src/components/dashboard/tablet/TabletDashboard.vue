@@ -21,6 +21,7 @@ defineProps<{
 const emit = defineEmits<{
   (e: 'page-change', page: number): void
   (e: 'task-created'): void
+  (e: 'status-change', row: User, value: boolean): void
 }>()
 
 const priorityOptions = [
@@ -54,6 +55,7 @@ const priorityOptions = [
       :page-size="pageSize"
       :total-data="totalData"
       :loading="loading"
+      @status-change="(row, value) => emit('status-change', row, value)"
       @page-change="emit('page-change', $event)"
     />
   </main>

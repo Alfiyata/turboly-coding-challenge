@@ -9,6 +9,7 @@ import MobileDashboard from '@/components/dashboard/mobile/MobileDashboard.vue'
 import TabletDashboard from '@/components/dashboard/tablet/TabletDashboard.vue'
 import DesktopDashboard from '@/components/dashboard/desktop/DesktopDashboard.vue'
 import Navbar from '@/components/layout/Navbar.vue'
+import Swal from 'sweetalert2'
 
 const { device } = useDeviceType()
 
@@ -81,6 +82,36 @@ async function onTaskCreated() {
   await Promise.all([fetchTasks(1), fetchIncompleteTodayTasks()])
 }
 
+async function onStatusChange(row: User, value: boolean) {
+  try {
+    await taskService.updateCompleted(row.id, value)
+
+    const task = data.value.find((item) => item.id === row.id)
+
+    if (task) {
+      task.completed = value
+    }
+
+    await fetchIncompleteTodayTasks()
+
+    await Swal.fire({
+      icon: 'success',
+      title: 'Task updated',
+      text: value ? 'Task marked as completed.' : 'Task marked as incomplete.',
+      confirmButtonColor: '#10b8e1',
+    })
+  } catch {
+    await fetchTasks(currentPage.value)
+
+    await Swal.fire({
+      icon: 'error',
+      title: 'Update failed',
+      text: 'Unable to update task status. Please try again.',
+      confirmButtonColor: '#10b8e1',
+    })
+  }
+}
+
 onMounted(() => {
   Promise.all([fetchTasks(), fetchIncompleteTodayTasks()])
 })
@@ -102,5 +133,6 @@ onMounted(() => {
     :alert-variant="dashboardAlert.variant"
     @page-change="onPageChange"
     @task-created="onTaskCreated"
+    @status-change="onStatusChange"
   />
 </template>

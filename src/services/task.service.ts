@@ -41,4 +41,11 @@ export const taskService = {
     const response = await api.post("/tasks", payload);
     return response.data;
   },
+
+  async updateCompleted(taskId: number, completed: boolean) {
+    const response = await api.patch(`/tasks/${taskId}/completed`, {
+      completed,
+    });
+    return response.data;
+  }
 };

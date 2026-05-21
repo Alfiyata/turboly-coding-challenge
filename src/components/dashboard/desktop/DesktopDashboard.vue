@@ -22,6 +22,7 @@ defineProps<{
 const emit = defineEmits<{
   (e: 'page-change', page: number): void
   (e: 'task-created'): void
+  (e: 'status-change', row: User, value: boolean): void
 }>()
 
 const priorityOptions = [
@@ -30,11 +31,6 @@ const priorityOptions = [
   { label: 'Low', value: 3 },
 ]
 
-function onStatusChange(row: User, value: boolean) {
-  row.completed = value
-
-  // Call API update here.
-}
 </script>
 
 <template>
@@ -59,7 +55,7 @@ function onStatusChange(row: User, value: boolean) {
       :page-size="pageSize"
       :total-data="totalData"
       :loading="loading"
-      @status-change="onStatusChange"
+      @status-change="(row, value) => emit('status-change', row, value)"
       @page-change="emit('page-change', $event)"
     />
   </main>
