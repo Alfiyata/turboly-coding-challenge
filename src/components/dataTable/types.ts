@@ -4,7 +4,7 @@ export interface User {
   title: string;
   due_date: string;
   priority: string | number;
-  completed: boolean;
+  completed: boolean | number;
   created_at?: string;
   updated_at?: string;
 }

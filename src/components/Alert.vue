@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue'
 import { AlertCircle, AlertTriangle, CheckCircle, Info, X, XCircle } from '@lucide/vue'
 
-type AlertVariant = 'default' | 'info' | 'success' | 'warning' | 'error'
+type AlertVariant = 'default' | 'info' | 'success' | 'warning' | 'danger'
 
 const props = withDefaults(
   defineProps<{
@@ -30,7 +30,7 @@ const styles: Record<AlertVariant, string> = {
   info: 'border-blue-200 bg-blue-50 text-blue-950',
   success: 'border-emerald-200 bg-emerald-50 text-emerald-950',
   warning: 'border-amber-200 bg-amber-50 text-amber-950',
-  error: 'border-red-200 bg-red-50 text-red-950',
+  danger: 'border-red-200 bg-red-50 text-red-950',
 }
 
 const iconStyles: Record<AlertVariant, string> = {
@@ -38,7 +38,7 @@ const iconStyles: Record<AlertVariant, string> = {
   info: 'text-blue-600',
   success: 'text-emerald-600',
   warning: 'text-amber-600',
-  error: 'text-red-600',
+  danger: 'text-red-600',
 }
 
 const icons = {
@@ -46,7 +46,7 @@ const icons = {
   info: Info,
   success: CheckCircle,
   warning: AlertTriangle,
-  error: XCircle,
+  danger: XCircle,
 }
 
 const alertClasses = computed(() => styles[props.variant])

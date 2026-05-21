@@ -14,6 +14,9 @@ defineProps<{
   pageSize: number
   totalData: number
   loading: boolean
+  alertTitle: string
+  alertDescription: string
+  alertVariant: 'success' | 'danger'
 }>()
 
 const emit = defineEmits<{
@@ -37,9 +40,9 @@ function onStatusChange(row: User, value: boolean) {
 <template>
   <main class="min-h-[calc(100vh-4rem)] space-y-6 bg-zinc-50 p-8 text-zinc-950">
     <Alert
-      title="Dashboard ready"
-      description="Your task data is loaded and ready to review."
-      variant="success"
+      :title="alertTitle"
+      :description="alertDescription"
+      :variant="alertVariant"
       dismissible
     />
 

@@ -21,9 +21,19 @@ export interface GetTasksResponse {
   total_data: number;
 }
 
+export interface GetDueDateTasksResponse {
+  total_data: number;
+  error_message: string | null;
+}
+
 export const taskService = {
   async getAll(params: GetTasksParams) {
     const response = await api.get<GetTasksResponse>("/tasks", { params });
+    return response.data;
+  },
+
+  async getDueDateTasks() {
+    const response = await api.get<GetDueDateTasksResponse>("/tasks/due-date");
     return response.data;
   },
 

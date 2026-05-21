@@ -18,6 +18,25 @@ const currentPage = ref(1)
 const lastPage = ref(1)
 const totalData = ref(0)
 const isLoading = ref(false)
+const incompleteTodayTaskCount = ref(0)
+
+const dashboardAlert = computed(() => {
+  const count = incompleteTodayTaskCount.value
+
+  if (count > 0) {
+    return {
+      title: 'Task due today',
+      description: `You have ${count} incomplete task${count > 1 ? 's' : ''} due today.`,
+      variant: 'danger' as const,
+    }
+  } else {
+    return {
+      title: 'All caught up!',
+      description: 'You have no incomplete tasks due today.',
+      variant: 'success' as const,
+    }
+  }
+})
 
 const dashboardComponent = computed(() => {
   if (device.value === 'mobile') {
@@ -49,16 +68,21 @@ async function fetchTasks(page = currentPage.value) {
   }
 }
 
-function onPageChange(page: number) {
-  fetchTasks(page)
+async function fetchIncompleteTodayTasks() {
+  const response = await taskService.getDueDateTasks()
+  incompleteTodayTaskCount.value = response.total_data
 }
 
-function onTaskCreated() {
-  fetchTasks(1)
+async function onPageChange(page: number) {
+  await fetchTasks(page)
+}
+
+async function onTaskCreated() {
+  await Promise.all([fetchTasks(1), fetchIncompleteTodayTasks()])
 }
 
 onMounted(() => {
-  fetchTasks()
+  Promise.all([fetchTasks(), fetchIncompleteTodayTasks()])
 })
 </script>
 
@@ -73,6 +97,9 @@ onMounted(() => {
     :page-size="pageSize"
     :total-data="totalData"
     :loading="isLoading"
+    :alert-title="dashboardAlert.title"
+    :alert-description="dashboardAlert.description"
+    :alert-variant="dashboardAlert.variant"
     @page-change="onPageChange"
     @task-created="onTaskCreated"
   />

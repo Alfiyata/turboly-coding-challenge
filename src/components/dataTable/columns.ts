@@ -3,6 +3,10 @@ import { h } from "vue";
 
 import type { User } from "./types";
 
+function isTaskCompleted(completed: boolean | number) {
+  return completed === true || completed === 1;
+}
+
 function getPriorityLabel(priority: string | number) {
   if (priority === 1 || priority === "1" || priority === "High") {
     return "High";
@@ -65,16 +69,16 @@ export const columns: ColumnDef<User>[] = [
       h("label", { class: "inline-flex items-center gap-2 text-sm text-gray-700" }, [
         h("input", {
           type: "checkbox",
-          checked: row.original.completed,
+          checked: isTaskCompleted(row.original.completed),
           class:
             "h-4 w-4 rounded border-gray-300 accent-[#10b8e1] focus:ring-2 focus:ring-gray-500 focus:outline-none",
-          "aria-label": row.original.completed ? "Done" : "Mark as done",
+          "aria-label": isTaskCompleted(row.original.completed) ? "Done" : "Mark as done",
           onChange: (event: Event) => {
             const target = event.target as HTMLInputElement;
             table.options.meta?.onStatusChange?.(row.original, target.checked);
           },
         }),
-        row.original.completed ? "Done" : "Mark as done",
+        isTaskCompleted(row.original.completed) ? "Done" : "Mark as done",
       ]),
   },
 ];

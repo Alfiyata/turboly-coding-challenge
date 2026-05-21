@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Alert from '@/components/Alert.vue'
 import DataTable from '@/components/dataTable/DataTable.vue'
 import FormTask from '@/components/FormTask.vue'
 import type { ColumnDef } from '@tanstack/vue-table'
@@ -12,6 +13,9 @@ defineProps<{
   pageSize: number
   totalData: number
   loading: boolean
+  alertTitle: string
+  alertDescription: string
+  alertVariant: 'success' | 'danger'
 }>()
 
 const emit = defineEmits<{
@@ -29,6 +33,13 @@ const priorityOptions = [
 <template>
   <main class="min-h-[calc(100vh-4rem)] space-y-5 bg-zinc-50 p-6 text-zinc-950">
     <h1 class="text-2xl font-semibold">Tablet Dashboard</h1>
+
+    <Alert
+      :title="alertTitle"
+      :description="alertDescription"
+      :variant="alertVariant"
+      dismissible
+    />
 
     <FormTask @task-created="emit('task-created')" />
 
