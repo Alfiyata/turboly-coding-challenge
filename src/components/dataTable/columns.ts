@@ -3,6 +3,18 @@ import { h } from "vue";
 
 import type { User } from "./types";
 
+function getPriorityClass(priority: string) {
+  if (priority === "High") {
+    return "bg-red-100 text-red-700 border-red-200";
+  }
+
+  if (priority === "Medium") {
+    return "bg-yellow-100 text-yellow-800 border-yellow-200";
+  }
+
+  return "bg-gray-100 text-gray-700 border-gray-200";
+}
+
 export const columns: ColumnDef<User>[] = [
   {
     accessorKey: "id",
@@ -21,6 +33,17 @@ export const columns: ColumnDef<User>[] = [
   {
     accessorKey: "priority",
     header: "Priority",
+    cell: ({ row }) =>
+      h(
+        "span",
+        {
+          class: [
+            "inline-flex items-center rounded-md border px-2 py-1 text-xs font-medium",
+            getPriorityClass(row.original.priority),
+          ],
+        },
+        row.original.priority,
+      ),
   },
   {
     accessorKey: "is_finished",

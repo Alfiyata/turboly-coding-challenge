@@ -89,7 +89,7 @@ watch(selectedDueDate, (date) => {
 </script>
 
 <template>
-  <div class="rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden p-4">
+  <div class="w-full max-w-full rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
     <div class="mb-4 flex flex-wrap items-center gap-3">
       <Input v-model="nameFilterValue" placeholder="Search name"
         class="w-full border border-gray-300 focus:ring-2 focus:ring-gray-500 focus:outline-none sm:w-44" />
@@ -111,30 +111,31 @@ watch(selectedDueDate, (date) => {
       </div>
     </div>
 
+    <div class="w-full overflow-x-auto">
+      <table class="min-w-760px w-full">
+        <thead>
+          <tr v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id">
+            <th v-for="header in headerGroup.headers" :key="header.id" class="border-b p-3 text-left border-gray-200 whitespace-nowrap">
+              <FlexRender :render="header.column.columnDef.header
+                " :props="header.getContext()" />
+            </th>
+          </tr>
+        </thead>
 
-    <table class="w-full">
-      <thead>
-        <tr v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id">
-          <th v-for="header in headerGroup.headers" :key="header.id" class="border-b p-3 text-left border-gray-200">
-            <FlexRender :render="header.column.columnDef.header
-              " :props="header.getContext()" />
-          </th>
-        </tr>
-      </thead>
-
-      <tbody>
-        <tr v-for="row in table.getRowModel().rows" :key="row.id">
-          <td v-for="cell in row.getVisibleCells()" :key="cell.id" class="p-3 border-b border-gray-200">
-            <FlexRender :render="cell.column.columnDef.cell ?? cell.getValue()
-              " :props="cell.getContext()" />
-          </td>
-        </tr>
-        <tr v-if="!table.getRowModel().rows.length">
-          <td :colspan="table.getAllColumns().length" class="p-6 text-center text-sm text-gray-500">
-            No results.
-          </td>
-        </tr>
-      </tbody>
-    </table>
+        <tbody>
+          <tr v-for="row in table.getRowModel().rows" :key="row.id">
+            <td v-for="cell in row.getVisibleCells()" :key="cell.id" class="p-3 border-b border-gray-200 whitespace-nowrap">
+              <FlexRender :render="cell.column.columnDef.cell ?? cell.getValue()
+                " :props="cell.getContext()" />
+            </td>
+          </tr>
+          <tr v-if="!table.getRowModel().rows.length">
+            <td :colspan="table.getAllColumns().length" class="p-6 text-center text-sm text-gray-500">
+              No results.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>

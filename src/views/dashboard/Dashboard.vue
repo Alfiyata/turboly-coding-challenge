@@ -14,15 +14,15 @@ const { device } = useDeviceType()
 const data: User[] = [
   {
     id: 1,
-    task: 'Alfiyata',
-    dueDate: 'alfy@gmail.com',
+    task: 'Create a new task management app',
+    dueDate: '2023-10-15',
     priority: 'High',
     is_finished: false,
   },
   {
     id: 2,
-    task: 'John',
-    dueDate: 'john@gmail.com',
+    task: 'Design the user interface for the task management app',
+    dueDate: '2023-10-20',
     priority: 'Medium',
     is_finished: true,
   },

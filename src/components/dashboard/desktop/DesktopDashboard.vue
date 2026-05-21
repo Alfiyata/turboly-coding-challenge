@@ -41,6 +41,10 @@ function onStatusChange(row: User, value: boolean) {
 
   // Call API update here.
 }
+
+function onTaskCreated(task: User) {
+  data.value.unshift(task)
+}
 </script>
 
 <template>
@@ -52,7 +56,7 @@ function onStatusChange(row: User, value: boolean) {
       dismissible
     />
 
-    <FormTask />
+    <FormTask @task-created="onTaskCreated" />
 
     <DataTable
       :columns="columns"
