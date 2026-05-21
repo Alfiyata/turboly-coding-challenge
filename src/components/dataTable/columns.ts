@@ -3,12 +3,24 @@ import { h } from "vue";
 
 import type { User } from "./types";
 
-function getPriorityClass(priority: string) {
-  if (priority === "High") {
+function getPriorityLabel(priority: string | number) {
+  if (priority === 1 || priority === "1" || priority === "High") {
+    return "High";
+  }
+
+  if (priority === 2 || priority === "2" || priority === "Medium") {
+    return "Medium";
+  }
+
+  return "Low";
+}
+
+function getPriorityClass(priority: string | number) {
+  if (priority === 1 || priority === "1" || priority === "High") {
     return "bg-red-100 text-red-700 border-red-200";
   }
 
-  if (priority === "Medium") {
+  if (priority === 2 || priority === "2" || priority === "Medium") {
     return "bg-yellow-100 text-yellow-800 border-yellow-200";
   }
 
@@ -17,17 +29,18 @@ function getPriorityClass(priority: string) {
 
 export const columns: ColumnDef<User>[] = [
   {
-    accessorKey: "id",
-    header: "ID",
+    id: "no",
+    header: "No",
+    cell: ({ row }) => row.index + 1,
   },
 
   {
-    accessorKey: "task",
+    accessorKey: "title",
     header: "Task",
   },
 
   {
-    accessorKey: "dueDate",
+    accessorKey: "due_date",
     header: "Due Date",
   },
   {
@@ -42,26 +55,26 @@ export const columns: ColumnDef<User>[] = [
             getPriorityClass(row.original.priority),
           ],
         },
-        row.original.priority,
+        getPriorityLabel(row.original.priority),
       ),
   },
   {
-    accessorKey: "is_finished",
+    accessorKey: "completed",
     header: "Status",
     cell: ({ row, table }) =>
       h("label", { class: "inline-flex items-center gap-2 text-sm text-gray-700" }, [
         h("input", {
           type: "checkbox",
-          checked: row.original.is_finished,
+          checked: row.original.completed,
           class:
             "h-4 w-4 rounded border-gray-300 accent-[#10b8e1] focus:ring-2 focus:ring-gray-500 focus:outline-none",
-          "aria-label": row.original.is_finished ? "Done" : "Mark as done",
+          "aria-label": row.original.completed ? "Done" : "Mark as done",
           onChange: (event: Event) => {
             const target = event.target as HTMLInputElement;
             table.options.meta?.onStatusChange?.(row.original, target.checked);
           },
         }),
-        row.original.is_finished ? "Done" : "Mark as done",
+        row.original.completed ? "Done" : "Mark as done",
       ]),
   },
 ];

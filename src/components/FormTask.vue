@@ -12,24 +12,31 @@ const emit = defineEmits<{
   (e: 'task-created', payload: User): void
 }>()
 
-const task = ref('')
+const title = ref('')
 const date = ref<Date | null>(null)
 const priority = ref('')
 const isSubmitting = ref(false)
 const errorMessage = ref('')
 
 const priorityOptions = [
-  { label: 'High', value: 'High' },
-  { label: 'Medium', value: 'Medium' },
-  { label: 'Low', value: 'Low' },
+  { label: 'High', value: '1' },
+  { label: 'Medium', value: '2' },
+  { label: 'Low', value: '3' },
 ]
 
 function formatDate(value: Date) {
-  return value.toLocaleDateString('fr-CA')
+  const year = value.getFullYear()
+  const month = String(value.getMonth() + 1).padStart(2, '0')
+  const day = String(value.getDate()).padStart(2, '0')
+  const hours = String(value.getHours()).padStart(2, '0')
+  const minutes = String(value.getMinutes()).padStart(2, '0')
+  const seconds = String(value.getSeconds()).padStart(2, '0')
+
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
 }
 
 async function handleSubmit() {
-  if (!task.value || !date.value || !priority.value) {
+  if (!title.value || !date.value || !priority.value) {
     errorMessage.value = 'Please complete all task fields.'
     return
   }
@@ -39,7 +46,7 @@ async function handleSubmit() {
 
   try {
     const createdTask = await taskService.create({
-      task: task.value,
+      title: title.value,
       due_date: formatDate(date.value),
       priority: priority.value,
       status: "todo",
@@ -54,7 +61,7 @@ async function handleSubmit() {
       confirmButtonColor: '#10b8e1',
     })
 
-    task.value = ''
+    title.value = ''
     date.value = null
     priority.value = ''
   } catch {
@@ -68,7 +75,7 @@ async function handleSubmit() {
 <template>
   <form class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm" @submit.prevent="handleSubmit">
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-      <Input v-model="task" placeholder="Name Task"
+      <Input v-model="title" placeholder="Name Task"
         class="border border-gray-300 focus:ring-2 focus:ring-gray-500 focus:outline-none" />
       <VueDatePicker v-model="date" :teleport="true" :ui="{ menu: 'z-[999999]' }" />
       <Select v-model="priority" placeholder="Select priority" :options="priorityOptions"

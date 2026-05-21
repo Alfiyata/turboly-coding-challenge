@@ -8,7 +8,7 @@ export interface LoginPayload {
 export const authService = {
   async login(payload: LoginPayload) {
     // REAL API
-    const response = await api.post("/login", payload);
+    const response = await api.post("/user/login", payload);
     return response.data;
 
     // MOCK LOGIN

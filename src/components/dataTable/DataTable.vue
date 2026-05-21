@@ -23,6 +23,16 @@ const props = defineProps<{
   filterColumnId?: string;
   filterPlaceholder?: string;
   filterOptions?: FilterOption[];
+  currentPage?: number;
+  lastPage?: number;
+  pageSize?: number;
+  totalData?: number;
+  loading?: boolean;
+}>();
+
+const emit = defineEmits<{
+  (e: "page-change", page: number): void;
+  (e: "status-change", row: any, value: boolean): void;
 }>();
 
 const columnFilters = ref<ColumnFiltersState>([]);
@@ -47,6 +57,11 @@ const table = useVueTable({
   onColumnFiltersChange: (updaterOrValue) => {
     columnFilters.value = functionalUpdate(updaterOrValue, columnFilters.value);
   },
+  meta: {
+    onStatusChange: (row, value) => {
+      emit("status-change", row, value);
+    },
+  },
 });
 
 const filterValue = computed<string | number>({
@@ -68,10 +83,10 @@ const filterValue = computed<string | number>({
 
 const nameFilterValue = computed<string | number>({
   get() {
-    return (table.getColumn("task")?.getFilterValue() as string | number | undefined) ?? "";
+    return (table.getColumn("title")?.getFilterValue() as string | number | undefined) ?? "";
   },
   set(value) {
-    table.getColumn("task")?.setFilterValue(value === "" ? undefined : value);
+    table.getColumn("title")?.setFilterValue(value === "" ? undefined : value);
   },
 });
 
@@ -80,12 +95,27 @@ function formatDueDate(date: Date) {
   const day = String(date.getDate()).padStart(2, "0");
   const year = date.getFullYear();
 
-  return `${month}/${day}/${year}`;
+  return `${year}-${month}-${day}`;
 }
 
 watch(selectedDueDate, (date) => {
-  table.getColumn("dueDate")?.setFilterValue(date ? formatDueDate(date) : undefined);
+  table.getColumn("due_date")?.setFilterValue(date ? formatDueDate(date) : undefined);
 });
+
+const currentPage = computed(() => props.currentPage ?? 1);
+const lastPage = computed(() => props.lastPage ?? 1);
+const pageSize = computed(() => props.pageSize ?? props.data.length);
+const totalData = computed(() => props.totalData ?? props.data.length);
+const pageStart = computed(() => (totalData.value === 0 ? 0 : (currentPage.value - 1) * pageSize.value + 1));
+const pageEnd = computed(() => Math.min(currentPage.value * pageSize.value, totalData.value));
+
+function goToPage(page: number) {
+  if (props.loading || page < 1 || page > lastPage.value || page === currentPage.value) {
+    return;
+  }
+
+  emit("page-change", page);
+}
 </script>
 
 <template>
@@ -112,7 +142,7 @@ watch(selectedDueDate, (date) => {
     </div>
 
     <div class="w-full overflow-x-auto">
-      <table class="min-w-760px w-full">
+      <table class="w-full min-w-[760px]">
         <thead>
           <tr v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id">
             <th v-for="header in headerGroup.headers" :key="header.id" class="border-b p-3 text-left border-gray-200 whitespace-nowrap">
@@ -123,19 +153,54 @@ watch(selectedDueDate, (date) => {
         </thead>
 
         <tbody>
-          <tr v-for="row in table.getRowModel().rows" :key="row.id">
-            <td v-for="cell in row.getVisibleCells()" :key="cell.id" class="p-3 border-b border-gray-200 whitespace-nowrap">
-              <FlexRender :render="cell.column.columnDef.cell ?? cell.getValue()
-                " :props="cell.getContext()" />
+          <tr v-if="loading">
+            <td :colspan="table.getAllColumns().length" class="p-6 text-center text-sm text-gray-500">
+              Loading tasks...
             </td>
           </tr>
-          <tr v-if="!table.getRowModel().rows.length">
+          <template v-else>
+            <tr v-for="row in table.getRowModel().rows" :key="row.id">
+              <td v-for="cell in row.getVisibleCells()" :key="cell.id" class="p-3 border-b border-gray-200 whitespace-nowrap">
+                <FlexRender :render="cell.column.columnDef.cell ?? cell.getValue()
+                  " :props="cell.getContext()" />
+              </td>
+            </tr>
+          </template>
+          <tr v-if="!loading && !table.getRowModel().rows.length">
             <td :colspan="table.getAllColumns().length" class="p-6 text-center text-sm text-gray-500">
               No results.
             </td>
           </tr>
         </tbody>
       </table>
+    </div>
+
+    <div class="mt-4 flex flex-col gap-3 pt-4 text-sm text-gray-600 sm:flex-row sm:items-center sm:justify-between">
+      <p>
+        Showing {{ pageStart }}-{{ pageEnd }} of {{ totalData }} tasks
+      </p>
+
+      <div class="flex items-center gap-2">
+        <button
+          type="button"
+          :disabled="loading || currentPage <= 1"
+          class="cursor-pointer rounded-md border border-gray-300 px-3 py-1.5 text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+          @click="goToPage(currentPage - 1)"
+        >
+          Previous
+        </button>
+        <span class="min-w-20 text-center">
+          Page {{ currentPage }} / {{ lastPage }}
+        </span>
+        <button
+          type="button"
+          :disabled="loading || currentPage >= lastPage"
+          class="cursor-pointer rounded-md border border-gray-300 px-3 py-1.5 text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+          @click="goToPage(currentPage + 1)"
+        >
+          Next
+        </button>
+      </div>
     </div>
   </div>
 </template>

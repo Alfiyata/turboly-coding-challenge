@@ -1,9 +1,12 @@
 export interface User {
   id: number;
-  task: string;
-  dueDate: string;
-  priority: string;
-  is_finished: boolean;
+  user_id?: number;
+  title: string;
+  due_date: string;
+  priority: string | number;
+  completed: boolean;
+  created_at?: string;
+  updated_at?: string;
 }
 
 declare module "@tanstack/vue-table" {

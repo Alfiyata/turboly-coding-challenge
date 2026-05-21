@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { columns } from '@/components/dataTable/columns'
 import type { User } from '@/components/dataTable/types'
 import { useDeviceType } from '@/composables/useDeviceType'
+import { taskService } from '@/services/task.service'
 
 import MobileDashboard from '@/components/dashboard/mobile/MobileDashboard.vue'
 import TabletDashboard from '@/components/dashboard/tablet/TabletDashboard.vue'
@@ -11,22 +12,12 @@ import Navbar from '@/components/layout/Navbar.vue'
 
 const { device } = useDeviceType()
 
-const data: User[] = [
-  {
-    id: 1,
-    task: 'Create a new task management app',
-    dueDate: '2023-10-15',
-    priority: 'High',
-    is_finished: false,
-  },
-  {
-    id: 2,
-    task: 'Design the user interface for the task management app',
-    dueDate: '2023-10-20',
-    priority: 'Medium',
-    is_finished: true,
-  },
-]
+const pageSize = 10
+const data = ref<User[]>([])
+const currentPage = ref(1)
+const lastPage = ref(1)
+const totalData = ref(0)
+const isLoading = ref(false)
 
 const dashboardComponent = computed(() => {
   if (device.value === 'mobile') {
@@ -39,9 +30,50 @@ const dashboardComponent = computed(() => {
 
   return DesktopDashboard
 })
+
+async function fetchTasks(page = currentPage.value) {
+  isLoading.value = true
+
+  try {
+    const response = await taskService.getAll({
+      page,
+      pageSize,
+    })
+
+    data.value = response.data
+    currentPage.value = response.current_page
+    lastPage.value = response.last_page
+    totalData.value = response.total_data
+  } finally {
+    isLoading.value = false
+  }
+}
+
+function onPageChange(page: number) {
+  fetchTasks(page)
+}
+
+function onTaskCreated() {
+  fetchTasks(1)
+}
+
+onMounted(() => {
+  fetchTasks()
+})
 </script>
 
 <template>
   <Navbar />
-  <component :is="dashboardComponent" :columns="columns" :data="data" />
+  <component
+    :is="dashboardComponent"
+    :columns="columns"
+    :data="data"
+    :current-page="currentPage"
+    :last-page="lastPage"
+    :page-size="pageSize"
+    :total-data="totalData"
+    :loading="isLoading"
+    @page-change="onPageChange"
+    @task-created="onTaskCreated"
+  />
 </template>

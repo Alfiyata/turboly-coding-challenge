@@ -3,45 +3,47 @@ import DataTable from '@/components/dataTable/DataTable.vue'
 import FormTask from '@/components/FormTask.vue'
 import type { ColumnDef } from '@tanstack/vue-table'
 import type { User } from '@/components/dataTable/types'
-import { ref, watch } from 'vue'
 
-const props = defineProps<{
+defineProps<{
   columns: ColumnDef<User>[]
   data: User[]
+  currentPage: number
+  lastPage: number
+  pageSize: number
+  totalData: number
+  loading: boolean
+}>()
+
+const emit = defineEmits<{
+  (e: 'page-change', page: number): void
+  (e: 'task-created'): void
 }>()
 
 const priorityOptions = [
-  { label: 'High', value: 'High' },
-  { label: 'Medium', value: 'Medium' },
-  { label: 'Low', value: 'Low' },
+  { label: 'High', value: 1 },
+  { label: 'Medium', value: 2 },
+  { label: 'Low', value: 3 },
 ]
-
-const tasks = ref<User[]>([...props.data])
-
-watch(
-  () => props.data,
-  (data) => {
-    tasks.value = [...data]
-  },
-)
-
-function onTaskCreated(task: User) {
-  tasks.value.unshift(task)
-}
 </script>
 
 <template>
   <main class="min-h-[calc(100vh-4rem)] space-y-4 bg-zinc-50 p-4 text-zinc-950">
     <h1 class="text-xl font-semibold">Mobile Dashboard</h1>
 
-    <FormTask @task-created="onTaskCreated" />
+    <FormTask @task-created="emit('task-created')" />
 
     <DataTable
       :columns="columns"
-      :data="tasks"
+      :data="data"
       filter-column-id="priority"
       filter-placeholder="All priorities"
       :filter-options="priorityOptions"
+      :current-page="currentPage"
+      :last-page="lastPage"
+      :page-size="pageSize"
+      :total-data="totalData"
+      :loading="loading"
+      @page-change="emit('page-change', $event)"
     />
   </main>
 </template>
